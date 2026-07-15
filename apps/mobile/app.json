@@ -1,0 +1,28 @@
+{
+  "expo": {
+    "name": "Sambung",
+    "slug": "sambung",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "sambung",
+    "platforms": ["ios", "android"],
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSCameraUsageDescription": "Kamera digunakan untuk scan QRIS"
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#ffffff"
+      },
+      "permissions": ["CAMERA"]
+    },
+    "plugins": [[
+      "expo-camera",
+      {
+        "cameraPermission": "Kamera digunakan untuk scan kode QRIS"
+      }
+    ]]
+  }
+}

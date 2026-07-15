@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --color-brand: #4caf50;
+    --color-brand-dark: #388e3c;
+  }
+
+  html {
+    font-family: system-ui, -apple-system, sans-serif;
+  }
+}

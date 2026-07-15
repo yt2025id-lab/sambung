@@ -1,0 +1,147 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum RemittanceStatus {
+  initiated
+  swapping
+  waiting_anchor
+  settled
+  failed
+  cancelled
+  refunded
+}
+
+model User {
+  id             String   @id @default(uuid()) @db.Uuid
+  googleId       String   @unique @map("google_id")
+  email          String   @unique
+  stellarAddress String?  @unique @map("stellar_address")
+  phone          String?
+  fullName       String?  @map("full_name")
+  avatarUrl      String?  @map("avatar_url")
+  kycStatus      String   @default("pending") @map("kyc_status")
+  createdAt      DateTime @default(now()) @map("created_at")
+  lastLogin      DateTime? @map("last_login")
+  isActive       Boolean  @default(true) @map("is_active")
+
+  remittances Remittance[]
+  recipients  Recipient[]
+
+  @@map("users")
+}
+
+model Recipient {
+  id             String   @id @default(uuid()) @db.Uuid
+  userId        String   @map("user_id") @db.Uuid
+  name          String
+  nmid          String
+  provider      String
+  phone         String?
+  bankCode      String?  @map("bank_code")
+  bankAccount   String?  @map("bank_account")
+  isFavorite    Boolean  @default(false) @map("is_favorite")
+  txCount       Int      @default(0) @map("tx_count")
+  totalReceived BigInt   @default(0) @map("total_received")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  remittances Remittance[]
+
+  @@index([userId])
+  @@index([nmid])
+  @@map("recipients")
+}
+
+model Remittance {
+  id                String           @id @default(uuid()) @db.Uuid
+  userId            String           @map("user_id") @db.Uuid
+  recipientId       String?          @map("recipient_id") @db.Uuid
+
+  recipientNmid     String           @map("recipient_nmid")
+  recipientProvider String           @map("recipient_provider")
+  recipientPhone    String?          @map("recipient_phone")
+
+  amountUsdc        Decimal          @map("amount_usdc") @db.Decimal(20, 7)
+  amountIdr         BigInt           @map("amount_idr")
+  feeUsdc           Decimal          @default(0) @map("fee_usdc") @db.Decimal(20, 7)
+  feeIdr            BigInt           @default(0) @map("fee_idr")
+  rateAtTx          Decimal?         @map("rate_at_tx") @db.Decimal(12, 2)
+
+  status            RemittanceStatus @default(initiated)
+  failureReason     String?          @map("failure_reason")
+
+  stellarTxHash     String?          @map("stellar_tx_hash")
+  sorobanPaymentId  String?          @map("soroban_payment_id")
+
+  pjpPartnerId      String?          @map("pjp_partner_id")
+  pjpTxId           String?          @map("pjp_tx_id")
+
+  anchorQuoteId     String?          @map("anchor_quote_id")
+  anchorTxHash      String?          @map("anchor_tx_hash")
+
+  createdAt         DateTime         @default(now()) @map("created_at")
+  completedAt       DateTime?        @map("completed_at")
+  updatedAt         DateTime         @updatedAt @map("updated_at")
+
+  user      User       @relation(fields: [userId], references: [id])
+  recipient Recipient? @relation(fields: [recipientId], references: [id])
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([stellarTxHash])
+  @@map("remittances")
+}
+
+model RateCache {
+  id         String   @id @default(uuid()) @db.Uuid
+  baseAsset  String   @map("base_asset")
+  quoteAsset String   @map("quote_asset")
+  bid        Decimal  @db.Decimal(12, 2)
+  ask        Decimal  @db.Decimal(12, 2)
+  source     String   @default("soroswap")
+  cachedAt   DateTime @default(now()) @map("cached_at")
+
+  @@unique([baseAsset, quoteAsset])
+  @@map("rate_cache")
+}
+
+model PjpPartner {
+  id             String   @id
+  name           String
+  type           String
+  apiBaseUrl     String   @map("api_base_url")
+  apiKeyHash     String   @map("api_key_hash")
+  webhookUrl     String?  @map("webhook_url")
+  webhookSecret  String?  @map("webhook_secret")
+  supportsQris   Boolean  @default(true) @map("supports_qris")
+  supportsBank   Boolean  @default(false) @map("supports_bank")
+  feeBps         Int      @default(30) @map("fee_bps")
+  isActive       Boolean  @default(true) @map("is_active")
+  healthStatus   String   @default("healthy") @map("health_status")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  @@map("pjp_partners")
+}
+
+model AuditLog {
+  id         String   @id @default(uuid()) @db.Uuid
+  action     String
+  entityType String   @map("entity_type")
+  entityId   String   @map("entity_id") @db.Uuid
+  actorType  String   @map("actor_type")
+  actorId    String?  @map("actor_id")
+  metadata   Json?    @default("{}")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@index([entityType, entityId])
+  @@index([createdAt])
+  @@map("audit_log")
+}

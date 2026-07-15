@@ -1,0 +1,15 @@
+node_modules/
+dist/
+.next/
+.env
+.env.local
+*.wasm
+target/
+.turbo/
+coverage/
+*.log
+.DS_Store
+.expo/
+ios/
+android/
+
