@@ -9,7 +9,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="id">
-      <body className="min-h-screen bg-zinc-50 text-zinc-900 antialiased">
+      <body className="min-h-screen bg-[#0a0a0b] antialiased">
         {children}
       </body>
     </html>
@@ -17,6 +17,6 @@ export default function RootLayout({
 }
 
 export const metadata: Metadata = {
-  title: "Sambung — Kirim Uang ke Indonesia",
-  description: "Kirim uang ke Indonesia dengan USDC via Stellar, sampai ke QRIS",
+  title: "Sambung — QR rail on Stellar",
+  description: "Kirim USDC QRIS ke Indonesia. QR rail on Stellar — kirim dari mana saja, sampai ke QRIS tujuan.",
 };
