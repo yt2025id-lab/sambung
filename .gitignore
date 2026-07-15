@@ -13,3 +13,5 @@ coverage/
 ios/
 android/
 
+.vercel
+.env*

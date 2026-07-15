@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { Suspense, useState, useEffect } from "react";
 import type { FC } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { getQuote, createRemittance } from "@/lib/api";
 import type { QuoteResponse } from "@/lib/api";
 
-const ConfirmPage: FC = () => {
+function ConfirmContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [usdcAmount, setUsdcAmount] = useState(searchParams.get("amount") || "");
@@ -110,6 +110,12 @@ const ConfirmPage: FC = () => {
       </button>
     </main>
   );
-};
+}
+
+const ConfirmPage: FC = () => (
+  <Suspense fallback={<div className="p-12 text-center text-zinc-500">Memuat...</div>}>
+    <ConfirmContent />
+  </Suspense>
+);
 
 export default ConfirmPage;

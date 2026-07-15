@@ -1,10 +1,11 @@
 "use client";
 
+import { Suspense } from "react";
 import type { FC } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 
-const SuccessPage: FC = () => {
+function SuccessContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -69,6 +70,12 @@ function Row({
       <span className={valueClass}>{value}</span>
     </div>
   );
-};
+}
+
+const SuccessPage: FC = () => (
+  <Suspense fallback={<div className="p-12 text-center text-zinc-500">Memuat...</div>}>
+    <SuccessContent />
+  </Suspense>
+);
 
 export default SuccessPage;

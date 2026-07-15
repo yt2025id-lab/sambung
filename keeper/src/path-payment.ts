@@ -1,8 +1,8 @@
 import {
   Horizon, Keypair, TransactionBuilder,
-  Operation, Asset, BASE_FEE, Memo,
+  Operation, BASE_FEE, Memo,
 } from '@stellar/stellar-sdk'
-import { config } from './config.js'
+import { config, USDC, IDRT } from './config.js'
 
 const server = new Horizon.Server(config.STELLAR_HORIZON_URL)
 
@@ -15,12 +15,12 @@ export async function executePathPayment(remittanceId: string): Promise<string> 
     networkPassphrase: config.STELLAR_NETWORK_PASSPHRASE,
   })
     .addOperation(Operation.pathPaymentStrictSend({
-      sendAsset: config.USDC,
+      sendAsset: USDC,
       sendAmount: '100',
       destination: config.ANCHOR_IDRT_ISSUER,
-      destAsset: config.IDRT,
+      destAsset: IDRT,
       destMin: '1',
-      path: [config.USDC, config.IDRT],
+      path: [USDC, IDRT],
     }))
     .addMemo(Memo.hash(remittanceId))
     .setTimeout(30)

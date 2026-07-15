@@ -1,6 +1,6 @@
 import {
   Horizon, Keypair, TransactionBuilder,
-  Operation, Asset, BASE_FEE,
+  Operation, Asset, BASE_FEE, Memo,
 } from '@stellar/stellar-sdk'
 import { config } from '../config.js'
 
@@ -58,10 +58,7 @@ export async function submitPathPayment(params: {
       destMin: params.destMin,
       path,
     }))
-    .addOperation(Operation.setOptions({
-      memoType: 'hash',
-      memo: params.paymentId,
-    }))
+    .addMemo(Memo.hash(params.paymentId))
     .setTimeout(30)
     .build()
 
