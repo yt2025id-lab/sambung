@@ -1,37 +1,48 @@
 "use client"
 
-import { useEffect, useState } from "react"
 import type { FC } from "react"
 import Link from "next/link"
+import { useSession, signOut } from "next-auth/react"
 import { useRouter } from "next/navigation"
-
-interface Session {
-  email: string
-  name: string
-  picture?: string
-}
+import { useEffect } from "react"
 
 const MerchantPage: FC = () => {
+  const { data: session, status } = useSession()
   const router = useRouter()
-  const [session, setSession] = useState<Session | null>(null)
-  const [checking, setChecking] = useState(true)
 
   useEffect(() => {
-    const raw = localStorage.getItem("sambung.merchant_session")
-    if (!raw) {
+    if (status === "unauthenticated") {
       router.replace("/app/merchant/login")
-      return
     }
-    setSession(JSON.parse(raw))
-    setChecking(false)
-  }, [router])
+  }, [status, router])
 
-  const handleSignOut = () => {
-    localStorage.removeItem("sambung.merchant_session")
-    router.push("/app/merchant/login")
+  if (status === "loading" || !session) {
+    return (
+      <div
+        className="min-h-screen bg-[#0a0a0b]"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <div
+          style={{
+            width: "1.5rem",
+            height: "1.5rem",
+            borderRadius: "50%",
+            border: "2px solid rgba(255,255,255,0.1)",
+            borderTopColor: "var(--color-brand)",
+            animation: "spin 0.6s linear infinite",
+          }}
+        />
+        <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
+      </div>
+    )
   }
 
-  if (checking || !session) return null
+  const email = session.user?.email ?? ""
+  const initial = email.charAt(0).toUpperCase()
 
   return (
     <div
@@ -53,7 +64,7 @@ const MerchantPage: FC = () => {
         </Link>
         <nav style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
           <button
-            onClick={handleSignOut}
+            onClick={() => signOut({ callbackUrl: "/app/merchant/login" })}
             className="landing-nav-link"
             style={{ border: "none", background: "none", cursor: "pointer" }}
           >
@@ -93,10 +104,10 @@ const MerchantPage: FC = () => {
                 fontWeight: 700,
               }}
             >
-              {session.email[0].toUpperCase()}
+              {initial}
             </div>
             <div>
-              <p style={{ fontSize: "0.9375rem", fontWeight: 600 }}>{session.email}</p>
+              <p style={{ fontSize: "0.9375rem", fontWeight: 600 }}>{email}</p>
               <p className="mono-label" style={{ color: "var(--color-brand)", marginTop: "0.125rem" }}>
                 Signed in with Google
               </p>

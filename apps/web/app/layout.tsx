@@ -1,5 +1,6 @@
 /* eslint-disable */
 import type { Metadata } from "next";
+import { SessionProvider } from "@/components/SessionProvider";
 import "./globals.css";
 
 export default function RootLayout({
@@ -10,7 +11,7 @@ export default function RootLayout({
   return (
     <html lang="id">
       <body className="min-h-screen bg-[#0a0a0b] antialiased">
-        {children}
+        <SessionProvider>{children}</SessionProvider>
       </body>
     </html>
   );

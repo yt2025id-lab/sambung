@@ -1,41 +1,14 @@
 "use client"
 
-import { Suspense, useEffect, useState } from "react"
+import { Suspense } from "react"
 import type { FC } from "react"
 import Link from "next/link"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useSearchParams } from "next/navigation"
+import { signIn } from "next-auth/react"
 
 const LoginContent: FC = () => {
-  const router = useRouter()
   const searchParams = useSearchParams()
-  const [checking, setChecking] = useState(true)
-
-  useEffect(() => {
-    const session = localStorage.getItem("sambung.merchant_session")
-    if (session) {
-      router.replace("/app/merchant")
-    } else {
-      setChecking(false)
-    }
-  }, [router])
-
   const expired = searchParams.get("expired") === "1"
-
-  const handleGoogleSignIn = () => {
-    localStorage.setItem(
-      "sambung.merchant_session",
-      JSON.stringify({
-        email: "yt2025id@gmail.com",
-        name: "yt2025id",
-        sub: "1234567890",
-        picture: "",
-        createdAt: Date.now(),
-      })
-    )
-    router.push("/app/merchant")
-  }
-
-  if (checking) return null
 
   return (
     <div
@@ -107,7 +80,7 @@ const LoginContent: FC = () => {
         )}
 
         <button
-          onClick={handleGoogleSignIn}
+          onClick={() => signIn("google", { callbackUrl: "/app/merchant" })}
           style={{
             display: "flex",
             alignItems: "center",
